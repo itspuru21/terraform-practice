@@ -1,1 +1,22 @@
-main.tf
+.git/
+
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+
+crash.log
+crash.*.log
+
+# Ignore all tfvars by default to protect secrets
+*.tfvars
+*.auto.tfvars
+
+# BUT explicitly allow your non-sensitive production settings
+!terraform.tfvars
+!staging.tfvars
+.terraform.tfstate.lock.info
+!.terraform.lock.hcl
+
+.vscode/
+.env
+.local
