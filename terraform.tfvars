@@ -1,1 +1,1 @@
-sg_name = "terra-demo-sg"
+sg_name = "terra-demo-sg-1"

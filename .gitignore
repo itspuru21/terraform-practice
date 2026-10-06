@@ -20,3 +20,5 @@ crash.*.log
 .vscode/
 .env
 .local
+
+*.plan
