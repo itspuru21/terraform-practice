@@ -1,0 +1,23 @@
+name: terraform infra deploy
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for requesting the OIDC JWT token
+  contents: read  # Required for actions/checkout
+
+jobs: 
+  plan:
+    runs-on: ubuntu-latest
+    environment: plan # Maps to your GitHub Environment
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+        
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::116645331047:role/demo-tf-role
+          aws-region: ap-south-1 # Adjust to your region
+      - name: list iam users
+        run: aws iam list-users
