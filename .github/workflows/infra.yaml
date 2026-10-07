@@ -19,7 +19,11 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::116645331047:role/tf-role-demo
           aws-region: ap-south-1 # Adjust to your region
-
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.16.4
       - name: Terraform Init
         run: terraform init -input=false
           
