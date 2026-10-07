@@ -11,7 +11,7 @@ permissions:
 jobs: 
   plan:
     runs-on: ubuntu-latest
-    environment: plan # Maps to your GitHub Environment
+    environment: plan
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -19,8 +19,8 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116645331047:role/tf-role-demo
-          aws-region: ap-south-1 # Adjust to your region
+          role-to-assume:  ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}   
       
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -39,32 +39,32 @@ jobs:
           name: tf-plan
           path: infra.plan
 
-  # apply:
-  #   needs: plan
-  #   runs-on: ubuntu-latest
-  #   environment: apply # Triggers the manual approval gate
-  #   steps:
-  #     - name: checkout code
-  #       uses: actions/checkout@v4
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: apply
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Configure AWS Credentials via OIDC
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: arn:aws:iam::116645331047:role/tf-role-demo
-  #         aws-region: ap-south-1 # Adjust to your region
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-  #     - name: Download Plan Artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: tf-plan
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tf-plan
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: 1.16.4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.16.4
           
-  #     - name: Terraform Init
-  #       run: terraform init -input=false
+      - name: Terraform Init
+        run: terraform init -input=false
 
-  #     - name: Terraform Apply
-  #       run: terraform apply -input=false -auto-approve infra.plan
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve infra.plan
