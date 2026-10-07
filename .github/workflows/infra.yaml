@@ -1,29 +1,58 @@
-name: "terraform infra deploy"
-on: workflow_dispatch
+name: terraform infra deploy
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write # Required for requesting the OIDC JWT token
+  contents: read  # Required for actions/checkout
 
 jobs: 
-  deploy:
+  plan:
     runs-on: ubuntu-latest
+    environment: plan # Maps to your GitHub Environment
     steps:
       - name: checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-          
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ap-south-1 # Adjust to your region
+
       - name: Terraform Init
-        id: init
         run: terraform init -input=false
           
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate
-          
       - name: Terraform Plan
-        id: plan
         run: terraform plan -input=false -out infra.plan
-        continue-on-error: true
 
-      
+      - name: upload the plan as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tf-plan
+          path: infra.plan
+
+  apply:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: apply # Triggers the manual approval gate
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ap-south-1 # Adjust to your region
+
+      - name: Download Plan Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: tf-plan
+          
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -input=false -auto-approve infra.plan
