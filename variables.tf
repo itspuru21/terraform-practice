@@ -1,4 +1,4 @@
 variable "sg_name" {
-  type = string
+  type        = string
   description = "name of the security group"
 }
