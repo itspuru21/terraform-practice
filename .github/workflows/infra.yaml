@@ -24,6 +24,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.16.4
+
       - name: Terraform Init
         run: terraform init -input=false
           
@@ -54,6 +55,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: tf-plan
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.16.4
           
       - name: Terraform Init
         run: terraform init -input=false
