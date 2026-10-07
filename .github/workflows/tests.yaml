@@ -1,4 +1,4 @@
-name: terraform infra deploy
+name: test workflow
 on:
   workflow_dispatch:
 
