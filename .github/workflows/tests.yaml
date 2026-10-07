@@ -16,7 +16,7 @@ jobs:
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::116645331047:role/demo-tf-role
+          role-to-assume: arn:aws:iam::116645331047:role/tf-role-demo
           aws-region: ap-south-1 # Adjust to your region
       - name: list iam users
         run: aws iam list-users
