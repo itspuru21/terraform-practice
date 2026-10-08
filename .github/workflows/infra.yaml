@@ -8,6 +8,10 @@ permissions:
   id-token: write # Required for requesting the OIDC JWT token
   contents: read  # Required for actions/checkout
 
+env:
+  # 1. Define the cache directory globally
+  TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+
 jobs: 
   plan:
     runs-on: ubuntu-latest
@@ -26,9 +30,23 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.16.4
+      
+      - name: create plugin cache directory
+        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+
+      - name: cache terraform providers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-terraform-plugins-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-plugins-
 
       - name: Terraform Init
         run: terraform init -input=false
+      
+      - name: Terraform Validate
+        run: terraform validate
           
       - name: Terraform Plan
         run: terraform plan -input=false -out infra.plan
@@ -62,6 +80,17 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.16.4
+
+      - name: Create Terraform Plugin Cache Dir
+        run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
+
+      - name: Cache Terraform Providers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: ${{ runner.os }}-terraform-plugins-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-plugins-
           
       - name: Terraform Init
         run: terraform init -input=false
