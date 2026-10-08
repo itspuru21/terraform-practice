@@ -32,6 +32,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.16.4
+          terraform_wrapper: false
       
       - name: create plugin cache directory
         run: mkdir -p ${{ env.TF_PLUGIN_CACHE_DIR }}
@@ -53,11 +54,13 @@ jobs:
       - name: Terraform Plan
         id: tf-plan
         run: |
-          terraform plan -input=false -out infra.plan -detailed-exitcode || exitcode=$?
-          exitcode=${exitcode:-0}
+          set +e
+          terraform plan -input=false -out infra.plan -detailed-exitcode
+          exitcode=$?
+          set -e
           echo "exit_code=$exitcode" >> $GITHUB_OUTPUT
           
-          if [ $exitcode -eq 1 ]; then
+          if [ "$exitcode" -eq 1 ]; then
             echo "Terraform plan failed!"
             exit 1
           fi
