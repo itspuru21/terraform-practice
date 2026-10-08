@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: plan
     outputs:
-      tf_exitcode: ${{ steps.tf-plan.outputs.exit-code }}
+      tf_exitcode: ${{ steps.tf-plan.outputs.exit_code }}
     steps:
       - name: checkout code
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
         run: |
           terraform plan -input=false -out infra.plan -detailed-exitcode || exitcode=$?
           exitcode=${exitcode:-0}
-          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          echo "exit_code=$exitcode" >> $GITHUB_OUTPUT
           
           if [ $exitcode -eq 1 ]; then
             echo "Terraform plan failed!"
