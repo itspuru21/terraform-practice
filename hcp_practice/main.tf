@@ -13,4 +13,9 @@ terraform {
 
 resource "aws_security_group" "demo_sg" {
   name = "demo-sg"
+
+  tags = {
+    Name = "Demo-hcp"
+  }
+
 }
