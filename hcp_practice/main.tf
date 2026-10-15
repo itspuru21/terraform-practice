@@ -16,6 +16,7 @@ resource "aws_security_group" "demo_sg" {
 
   tags = {
     Name = "Demo-hcp"
+    CREATEDON = timestamp()
   }
 
 }
